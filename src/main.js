@@ -31,7 +31,7 @@ let lightboxGallery = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
 });
 
-function onSubmit(e) {
+async function onSubmit(e) {
   e.preventDefault();
   refs.gallery.innerHTML = '';
   currentPage = 1;
@@ -47,67 +47,75 @@ function onSubmit(e) {
     return;
   }
 
-  getPictures(currentPage, searchQueryValue, picturesCountQuery)
-    .then(response => {
-      const { hits, totalHits } = response;
+  try {
+    const { hits, totalHits } = await getPictures(
+      currentPage,
+      searchQueryValue,
+      picturesCountQuery
+    );
 
-      if (hits.length < 1) {
-        onWarning(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-      }
+    if (hits.length < 1) {
+      onWarning(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
 
-      refs.gallery.insertAdjacentHTML('beforeend', markup(hits));
+    refs.gallery.insertAdjacentHTML('beforeend', markup(hits));
 
-      lightboxGallery.refresh();
+    lightboxGallery.refresh();
 
-      if (!(hits.length < 1)) {
-        iziToast.success({
-          title: 'Success',
-          message: `We found ${totalHits} images for you.`,
-        });
-      }
+    if (!(hits.length < 1)) {
+      iziToast.success({
+        title: 'Success',
+        message: `We found ${totalHits} images for you.`,
+      });
+    }
 
-      if (totalHits > picturesCountQuery) {
-        refs.loadButton.hidden = false;
-      }
+    if (totalHits > picturesCountQuery) {
+      refs.loadButton.hidden = false;
+    }
 
-      if (hits.length > 0) {
-        onScroll();
-      }
+    if (hits.length > 0) {
+      onScroll();
+    }
 
-      refs.loader.hidden = true;
-      refs.form.reset();
-    })
-    .catch(onError);
+    refs.loader.hidden = true;
+    refs.form.reset();
+  } catch (error) {
+    onError(error.message);
+  }
 }
 
-function onLoadMore() {
+async function onLoadMore() {
   currentPage += 1;
   refs.loader.hidden = false;
 
-  getPictures(currentPage, searchQueryValue, picturesCountQuery)
-    .then(response => {
-      const { hits } = response;
+  try {
+    const { hits } = await getPictures(
+      currentPage,
+      searchQueryValue,
+      picturesCountQuery
+    );
 
-      refs.gallery.insertAdjacentHTML('beforeend', markup(hits));
+    refs.gallery.insertAdjacentHTML('beforeend', markup(hits));
 
-      lightboxGallery.refresh();
+    lightboxGallery.refresh();
 
-      if (hits.length < picturesCountQuery) {
-        onWarning("We're sorry, but you've reached the end of search results.");
+    if (hits.length < picturesCountQuery) {
+      onWarning("We're sorry, but you've reached the end of search results.");
 
-        refs.loadButton.hidden = true;
-        refs.loader.hidden = true;
-      }
-
-      if (hits.length > 0) {
-        onScroll();
-      }
-
+      refs.loadButton.hidden = true;
       refs.loader.hidden = true;
-    })
-    .catch(onError);
+    }
+
+    if (hits.length > 0) {
+      onScroll();
+    }
+
+    refs.loader.hidden = true;
+  } catch (error) {
+    onError(error.message);
+  }
 }
 
 function onError(err = `${err.name}: ${err.message}`) {
