@@ -15,8 +15,8 @@
   border-radius: 50%;
   background: #fff;
   box-shadow: 32px 0 #fff;
-  left: 150px;
-  top: 10px;
+  left: 0;
+  top: 12px;
   animation: ballMoveX 2s linear infinite;
 }
 

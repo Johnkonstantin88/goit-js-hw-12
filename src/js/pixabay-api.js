@@ -1,7 +1,6 @@
-import { refs } from '../main';
+import axios from 'axios';
 
-export function getPictures() {
-  const query = refs.form.elements.searchQuery.value.trim();
+export async function getPictures(page = 1, query, per_page) {
   const API_KEY = '42027897-ca60981f5971518ff8fefcb8b';
   const BASE_URL = 'https://pixabay.com/api/';
 
@@ -11,12 +10,11 @@ export function getPictures() {
     image_type: 'photo',
     orientation: 'horizontal',
     safesearcg: true,
+    page: page,
+    per_page: `${per_page}`,
   });
 
-  return fetch(`${BASE_URL}?${params}`).then(response => {
-    if (!response.ok) {
-      throw new Error(response.status);
-    }
-    return response.json();
-  });
+  const response = await axios.get(`${BASE_URL}?${params}`);
+
+  return response.data;
 }
