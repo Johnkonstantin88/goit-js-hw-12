@@ -36,14 +36,13 @@ async function onSubmit(e) {
   refs.gallery.innerHTML = '';
   currentPage = 1;
   refs.loader.hidden = false;
+  refs.loadButton.hidden = true;
 
   const { searchQuery } = e.currentTarget.elements;
   searchQueryValue = searchQuery.value.trim().toLowerCase();
 
   if (searchQueryValue === '') {
     onError('Sorry, but you must enter your search query. Please try again.');
-    refs.loadButton.hidden = true;
-
     return;
   }
 
@@ -73,10 +72,6 @@ async function onSubmit(e) {
 
     if (totalHits > picturesCountQuery) {
       refs.loadButton.hidden = false;
-    }
-
-    if (hits.length > 0) {
-      onScroll();
     }
 
     refs.loader.hidden = true;
